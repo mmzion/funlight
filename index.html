@@ -2,210 +2,166 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>আল্ট্রা প্রো ম্যাক্স ফ্লাশলাইট</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>স্ক্রিন ফ্লাশলাইট</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            height: 100vh;
-            height: 100dvh;
-            width: 100vw;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            overflow: hidden;
-        }
-
-        /* ১. ডিফল্ট অবস্থা: অফ (কালো স্ক্রিন) */
-        body.state-off {
-            background-color: #0d0e12;
-            color: #ffffff;
-        }
-
-        /* ২. অন অবস্থা: সম্পূর্ণ স্ক্রিন উজ্জ্বল সাদা (ফুল ফ্লাশলাইট) */
-        body.state-on {
-            background-color: #ffffff !important;
-            color: #111111;
-        }
-
-        .container {
-            text-align: center;
-            padding: 20px;
-            z-index: 10;
-        }
-
-        .icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease;
-        }
-
-        /* লাইট অন থাকলে আইকন চমকাবে */
-        .state-on .icon {
-            animation: glow 1.2s infinite alternate;
-        }
-
-        @keyframes glow {
-            from { transform: scale(1); filter: drop-shadow(0 0 15px #ffd600); }
-            to { transform: scale(1.1); filter: drop-shadow(0 0 35px #ffab00); }
-        }
-
-        /* অন বাটন */
-        .btn-toggle {
-            padding: 16px 36px;
-            font-size: 20px;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn-toggle:active {
-            transform: scale(0.95);
-        }
-
-        .btn-turn-on {
-            background: linear-gradient(135deg, #00e676, #00b0ff);
-            color: #0d0e12;
-            box-shadow: 0 8px 25px rgba(0, 230, 118, 0.4);
-        }
-
-        .btn-turn-off {
-            background: linear-gradient(135deg, #ff1744, #d50000);
-            color: #ffffff;
-            box-shadow: 0 8px 25px rgba(255, 23, 68, 0.4);
-            display: none;
-        }
-
-        .tip-text {
-            margin-top: 15px;
-            font-size: 14px;
-            opacity: 0.7;
-        }
-
-        /* সাবস্ক্রিপশন মডাল */
-        .modal-overlay {
+        /* পুরো স্ক্রিন জুড়ের লেআউট - ডিফল্ট পিচ ব্ল্যাক */
+        #screen {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background-color: #000000;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            z-index: 1;
+        }
+
+        /* আইকন */
+        #icon {
+            font-size: 80px;
+            margin-bottom: 25px;
+            line-height: 1;
+        }
+
+        /* বাটন স্টাইল */
+        .btn {
+            font-size: 20px;
+            font-weight: bold;
+            padding: 16px 36px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            transition: transform 0.15s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        /* ১. লাইট অন বাটন (সবুজ/নীল আভা) */
+        #onBtn {
+            display: inline-block;
+            background: linear-gradient(135deg, #00e676, #00b0ff);
+            color: #000000;
+        }
+
+        /* ২. লাইট অফ বাটন (লাল - ডিফল্ট হাইড থাকবে) */
+        #offBtn {
+            display: none;
+            background: linear-gradient(135deg, #ff1744, #c62828);
+            color: #ffffff;
+        }
+
+        #statusText {
+            margin-top: 15px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* --- পেমেন্ট মডাল (পপ-আপ) --- */
+        #payModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
             display: none;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(8px);
-            z-index: 999;
+            z-index: 9999;
             padding: 20px;
         }
 
-        .modal-box {
+        .modal-card {
             background: #ffffff;
             color: #222222;
-            padding: 26px 22px;
-            border-radius: 24px;
-            max-width: 380px;
+            padding: 25px 20px;
+            border-radius: 20px;
+            max-width: 350px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-            animation: popUp 0.25s ease-out;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
-        @keyframes popUp {
-            from { transform: scale(0.85); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-box h2 {
-            font-size: 22px;
+        .modal-card h3 {
             color: #d32f2f;
+            font-size: 20px;
             margin-bottom: 8px;
         }
 
-        .modal-box p {
+        .modal-card p {
             font-size: 14px;
-            color: #555;
-            margin-bottom: 14px;
+            color: #555555;
+            margin-bottom: 15px;
             line-height: 1.4;
         }
 
-        /* বিকাশ/নগদ/উপায় ব্যাজ */
+        /* ব্যাজ */
         .methods {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 6px;
+            margin-bottom: 12px;
         }
 
         .badge {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
-            padding: 5px 12px;
-            border-radius: 6px;
-            color: white;
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 4px;
         }
-
-        .bkash { background-color: #e2136e; }
-        .nagad { background-color: #f7941d; }
-        .upay  { background-color: #005a9c; }
+        .bkash { background: #e2136e; }
+        .nagad { background: #f7941d; }
+        .upay  { background: #005a9c; }
 
         /* নম্বর বক্স */
-        .number-box {
-            background: #f8f9fa;
-            border: 2px dashed #b0bec5;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .number-text {
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            color: #263238;
-        }
-
-        .copy-btn {
-            background: #37474f;
-            color: #fff;
-            border: none;
-            padding: 7px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .copy-btn:hover {
-            background: #212121;
-        }
-
-        .trx-input {
-            width: 100%;
-            padding: 12px;
-            font-size: 14px;
-            border: 1px solid #cfd8dc;
+        .num-box {
+            background: #f4f6f8;
+            border: 2px dashed #90a4ae;
             border-radius: 10px;
-            margin-bottom: 12px;
-            text-align: center;
-            outline: none;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
         }
 
-        .trx-input:focus {
-            border-color: #00c853;
+        .num-box span {
+            font-size: 17px;
+            font-weight: bold;
+            color: #263238;
+            letter-spacing: 1px;
+        }
+
+        .num-box button {
+            background: #37474f;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            cursor: pointer;
         }
 
         .btn-confirm {
@@ -213,45 +169,44 @@
             padding: 14px;
             font-size: 16px;
             font-weight: bold;
-            color: #fff;
+            color: white;
             background: #00c853;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
-            margin-bottom: 8px;
-            box-shadow: 0 4px 12px rgba(0, 200, 83, 0.3);
+            margin-bottom: 10px;
         }
 
-        .btn-cancel {
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            color: #78909c;
-            background: transparent;
+        .btn-refuse {
+            background: none;
             border: none;
+            color: #78909c;
+            font-size: 13px;
             cursor: pointer;
+            text-decoration: underline;
         }
     </style>
 </head>
-<body class="state-off" id="screen">
+<body>
 
-    <div class="container">
-        <div class="icon" id="lightIcon">🌑</div>
+    <!-- মূল স্ক্রিন -->
+    <div id="screen">
+        <div id="icon">🌑</div>
         
-        <!-- ১. লাইট অন করার বাটন (ডিফল্ট দেখাবে) -->
-        <button class="btn-toggle btn-turn-on" id="onBtn" onclick="turnOnLight()">লাইট অন করুন 🔦</button>
+        <!-- ১. লাইট অন বাটন (ডিফল্ট দেখাবে) -->
+        <button id="onBtn" class="btn" onclick="turnOnFlashlight()">লাইট অন করুন 🔦</button>
+        
+        <!-- ২. লাইট অফ বাটন (অন হওয়ার পর আসবে) -->
+        <button id="offBtn" class="btn" onclick="openPaymentModal()">লাইট অফ করুন 🛑</button>
 
-        <!-- ২. লাইট অফ করার বাটন (অন হওয়ার পর দেখাবে) -->
-        <button class="btn-toggle btn-turn-off" id="offBtn" onclick="tryTurnOffLight()">লাইট অফ করুন 🛑</button>
-
-        <p class="tip-text" id="statusText">স্ক্রিন বর্তমানে অন্ধকার। লাইট জ্বালাতে বাটনে চাপ দিন।</p>
+        <p id="statusText">স্ক্রিন বর্তমানে অফ আছে</p>
     </div>
 
     <!-- পেমেন্ট পপ-আপ -->
-    <div class="modal-overlay" id="payModal">
-        <div class="modal-box">
-            <h2>⚠️ প্রিমিয়াম ফিচার!</h2>
-            <p>লাইট জ্বালানো ফ্রি, তবে <strong>অফ করতে</strong> নিচের নম্বরে <strong>১০ টাকা সেন্ড মানি</strong> করতে হবে!</p>
+    <div id="payModal">
+        <div class="modal-card">
+            <h3>⚠️ সাবস্ক্রিপশন প্রয়োজন!</h3>
+            <p>লাইট জ্বালানো ফ্রি ছিল, কিন্তু <strong>অফ করতে</strong> নিচের নম্বরে <strong>১০ টাকা সেন্ড মানি</strong> করুন:</p>
 
             <div class="methods">
                 <span class="badge bkash">বিকাশ</span>
@@ -259,50 +214,64 @@
                 <span class="badge upay">উপায়</span>
             </div>
 
-            <div class="number-box">
-                <span class="number-text" id="phoneNum">01932084441</span>
-                <button class="copy-btn" id="copyBtn" onclick="copyNumber()">কপি</button>
+            <div class="num-box">
+                <span id="phoneNum">01932084441</span>
+                <button id="copyBtn" onclick="copyNumber()">কপি</button>
             </div>
 
-            <input type="text" id="trxInput" class="trx-input" placeholder="TrxID বা আপনার নম্বর লিখুন">
-
-            <button class="btn-confirm" id="confirmBtn" onclick="verifyAndTurnOff()">১০ টাকা পাঠিয়েছি, অফ করুন ⚡</button>
-            <button class="btn-cancel" onclick="refusePayment()">টাকা দেব না, লাইট জ্বলতেই থাকুক 🥲</button>
+            <button class="btn-confirm" id="confirmBtn" onclick="confirmPaymentAndTurnOff()">১০ টাকা পাঠিয়েছি, অফ করুন ⚡</button>
+            <button class="btn-refuse" onclick="refusePayment()">টাকা দেব না (লাইট জ্বলতেই থাকুক)</button>
         </div>
     </div>
 
     <script>
         const screen = document.getElementById('screen');
+        const icon = document.getElementById('icon');
         const onBtn = document.getElementById('onBtn');
         const offBtn = document.getElementById('offBtn');
-        const lightIcon = document.getElementById('lightIcon');
         const statusText = document.getElementById('statusText');
         const payModal = document.getElementById('payModal');
         const copyBtn = document.getElementById('copyBtn');
         const confirmBtn = document.getElementById('confirmBtn');
 
-        // ১. লাইট অন করা (ফুল স্ক্রিন উজ্জ্বল সাদা)
-        function turnOnLight() {
-            // মোবাইলে ফুলস্ক্রিন করার চেষ্টা করবে যাতে ফুল ব্রাইটনেস পাওয়া যায়
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => {});
-            }
+        let wakeLock = null;
 
-            screen.classList.remove('state-off');
-            screen.classList.add('state-on');
+        // ১. লাইট অন করা ফাংশন
+        function turnOnFlashlight() {
+            // (ক) তাৎক্ষণিক ব্যাকগ্রাউন্ড ১০০% সাদা ও টেক্সট ডার্ক করা
+            screen.style.backgroundColor = '#ffffff';
+            screen.style.color = '#000000';
+            icon.innerText = '💡';
+            statusText.innerText = 'ফ্লাশলাইট পূর্ণ শক্তিতে জ্বলছে!';
 
-            lightIcon.innerText = '💡';
+            // (খ) বাটন বদলে লাল "লাইট অফ" বাটন করা
             onBtn.style.display = 'none';
             offBtn.style.display = 'inline-block';
-            statusText.innerText = 'ফ্লাশলাইট পূর্ণ শক্তিতে জ্বলছে! অফ করতে নিচের বাটনে চাপ দিন।';
+
+            // (গ) ফুলস্ক্রিন করার চেষ্টা করা (যাতে ব্রাউজার বার ঢেকে সর্বোচ্চ আলো দেয়)
+            try {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen().catch(() => {});
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                }
+            } catch (e) {}
+
+            // (ঘ) মোবাইল স্ক্রিন যাতে নিভে না যায় (WakeLock)
+            if ('wakeLock' in navigator) {
+                navigator.wakeLock.request('screen').then(lock => {
+                    wakeLock = lock;
+                }).catch(() => {});
+            }
         }
 
-        // ২. অফ বাটনে ক্লিক করলে সাবস্ক্রিপশন চাওয়া
-        function tryTurnOffLight() {
+        // ২. লাইট অফ করতে গেলে মডাল পপ-আপ খোলা
+        function openPaymentModal() {
             payModal.style.display = 'flex';
         }
 
-        // নম্বর কপি ফাংশন
+        // ৩. নম্বর কপি করা
         function copyNumber() {
             const num = document.getElementById('phoneNum').innerText;
             navigator.clipboard.writeText(num).then(() => {
@@ -315,37 +284,42 @@
             });
         }
 
-        // টাকা দিতে অস্বীকার করলে লাইট অন-ই থাকবে
+        // টাকা না দিলে লাইট অফ হবে না
         function refusePayment() {
             payModal.style.display = 'none';
-            alert('টাকা ছাড়া সেবা বন্ধ হবে না! লাইট জ্বলতেই থাকবে 🔥');
+            alert('টাকা ছাড়া লাইট অফ হবে না! লাইট জ্বলতেই থাকবে 🔥');
         }
 
-        // ৩. পেমেন্ট ভেরিফাই করে লাইট অফ করা
-        function verifyAndTurnOff() {
-            confirmBtn.innerText = 'যাচাই করা হচ্ছে... ⏳';
+        // ৪. টাকা দিলে অফ হওয়া
+        function confirmPaymentAndTurnOff() {
+            confirmBtn.innerText = 'যাচাই করা হচ্ছে...';
             confirmBtn.disabled = true;
 
             setTimeout(() => {
-                // পপ-আপ লুকানো
+                // পপ-আপ বন্ধ
                 payModal.style.display = 'none';
                 confirmBtn.innerText = '১০ টাকা পাঠিয়েছি, অফ করুন ⚡';
                 confirmBtn.disabled = false;
 
-                // স্ক্রিন আবার ডার্ক করা
-                screen.classList.remove('state-on');
-                screen.classList.add('state-off');
+                // স্ক্রিন আবার সম্পূর্ণ কালো করা
+                screen.style.backgroundColor = '#000000';
+                screen.style.color = '#ffffff';
+                icon.innerText = '🌑';
+                statusText.innerText = '১০ টাকা পাওয়া গেছে। লাইট অফ করা হলো!';
 
-                lightIcon.innerText = '🌑';
+                // আবার অন বাটন ফেরত আনা
                 offBtn.style.display = 'none';
                 onBtn.style.display = 'inline-block';
-                statusText.innerText = '১০ টাকা সফলভাবে গ্রহণ করা হয়েছে। লাইট অফ করা হয়েছে!';
 
-                // ফুলস্ক্রিন থেকে বের হওয়া
+                // ফুলস্ক্রিন ও ওয়েক-লক রিলিজ
                 if (document.exitFullscreen && document.fullscreenElement) {
                     document.exitFullscreen().catch(() => {});
                 }
-            }, 1200);
+                if (wakeLock !== null) {
+                    wakeLock.release();
+                    wakeLock = null;
+                }
+            }, 1000);
         }
     </script>
 </body>
